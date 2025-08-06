@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,39 +9,56 @@
 <body class="bg-gradient-to-br from-green-100 to-green-300 min-h-screen flex items-center justify-center p-6">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
     <h2 class="text-3xl font-bold text-green-700 mb-4">Create Your Confession Link</h2>
-    <p class="text-gray-600 mb-6">Generate a unique link to receive anonymous messages.</p><input id="username" type="text" placeholder="Enter your display name (e.g., JohnDoe)" class="w-full px-4 py-2 border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mb-4">
+    <p class="text-gray-600 mb-6">Generate a unique link to receive anonymous messages.</p>
+    
+    <input id="username" type="text" placeholder="Enter your display name (e.g., JohnDoe)" class="w-full px-4 py-2 border-2 border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mb-4">
 
-<button onclick="generateLink()" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition duration-300">
-  Generate Link
-</button>
+    <button onclick="generateLink()" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition duration-300">
+      Generate Link
+    </button>
 
-<div id="result" class="mt-6 hidden">
-  <p class="text-gray-700 mb-2">Your anonymous confession link:</p>
-  <div class="bg-green-100 border border-green-400 rounded p-2 break-all text-sm">
-    <span id="linkOutput"></span>
+    <div id="result" class="mt-6 hidden">
+      <p class="text-gray-700 mb-2">Your anonymous confession link:</p>
+      <div class="bg-green-100 border border-green-400 rounded p-2 break-all text-sm">
+        <span id="linkOutput"></span>
+      </div>
+      <button onclick="copyLink()" class="mt-3 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow text-sm">
+        Copy Link
+      </button>
+    </div>
+
+    <div class="mt-8 text-sm">
+      <a href="index.html" class="text-green-600 hover:underline">← Back to Home</a>
+    </div>
   </div>
-  <button onclick="copyLink()" class="mt-3 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow text-sm">
-    Copy Link
-  </button>
-</div>
 
-<div class="mt-8 text-sm">
-  <a href="index.html" class="text-green-600 hover:underline">← Back to Home</a>
-</div>
-
-  </div>  <script>
-    function generateLink() {
+  <script>
+    async function generateLink() {
       const username = document.getElementById('username').value.trim();
       if (!username) {
         alert('Please enter a name.');
         return;
       }
 
-      // Simulated generated link
-      const link = `${window.location.origin}/confess.html?user=${encodeURIComponent(username)}`;
-
+      const link = `${window.location.origin}/frontend/confess.html?user=${encodeURIComponent(username)}`;
       document.getElementById('linkOutput').innerText = link;
       document.getElementById('result').classList.remove('hidden');
+
+      // Send to backend
+      try {
+        const response = await fetch('/api/create-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: username })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Something went wrong");
+        console.log('User registered:', data);
+      } catch (error) {
+        console.error('Error saving user:', error.message);
+        alert("User created, but backend connection failed.");
+      }
     }
 
     function copyLink() {
@@ -49,5 +67,6 @@
         alert('Link copied to clipboard!');
       });
     }
-  </script></body>
-  </html>
+  </script>
+</body>
+</html>

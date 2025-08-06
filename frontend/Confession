@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confession Board | AnonConfess</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-green-200 to-green-500 min-h-screen p-6">
+  <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+    <h1 class="text-3xl font-bold text-green-800 mb-4 text-center">Anonymous Confession Board</h1>
+    <p id="topicOwner" class="text-sm text-gray-500 text-center mb-6"></p><form id="confessForm" class="mb-8">
+  <textarea id="confession" rows="4" placeholder="Type your anonymous message here..." class="w-full border-2 border-green-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+  <button type="submit" class="mt-4 bg-green-700 text-white py-2 px-4 rounded hover:bg-green-800 transition">Submit Confession</button>
+</form>
+
+<hr class="mb-6">
+
+<h2 class="text-xl font-semibold text-green-700 mb-3">Messages</h2>
+<ul id="messages" class="space-y-4">
+  <!-- Messages will be added here -->
+</ul>
+
+<div class="mt-8 text-sm text-center">
+  <a href="index.html" class="text-green-700 hover:underline">← Back to Home</a>
+</div>
+
+  </div>  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('user') || 'Anonymous';
+    document.getElementById('topicOwner').innerText = `Confessions for: ${user}`;
+
+    const form = document.getElementById('confessForm');
+    const messagesList = document.getElementById('messages');
+
+    const storedMessages = JSON.parse(localStorage.getItem(`confess_${user}`)) || [];
+
+    function renderMessages() {
+      messagesList.innerHTML = '';
+      storedMessages.forEach(msg => {
+        const li = document.createElement('li');
+        li.className = 'bg-green-100 border border-green-300 rounded p-3 text-gray-800';
+        li.innerText = msg;
+        messagesList.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const confession = document.getElementById('confession').value.trim();
+      if (confession === '') return;
+      storedMessages.push(confession);
+      localStorage.setItem(`confess_${user}`, JSON.stringify(storedMessages));
+      document.getElementById('confession').value = '';
+      renderMessages();
+    });
+
+    renderMessages();
+  </script></body>
+</html>
